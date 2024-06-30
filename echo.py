@@ -7,7 +7,6 @@ class Echo:
     input: str
     output: click.utils.LazyFile
     chunk_size: int
-    no_n: bool
     format: str
     remote_file: str
 

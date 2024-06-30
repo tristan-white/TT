@@ -32,6 +32,7 @@ from pathlib import Path
 )
 @click.pass_context
 def cli(ctx: click.Context, **kwargs):
+    ctx.max_content_width = 120     # makes help menu wider than default (80)
     ctx.ensure_object(dict)
     for key, val in kwargs.items():
         ctx.obj[key] = val
@@ -55,7 +56,7 @@ def printf():
     "--format",
     type=click.Choice(["bash", "tmux"]),
     default="bash",
-    help="Format of the output script.",
+    help="""Format of the output script.""",
     show_default=True,
 )
 @click.pass_context
@@ -98,18 +99,17 @@ def echo(ctx: click.Context, **kwargs):
         remote_file=ctx.obj["remote_file"],
         format=kwargs.get("format"),    
         chunk_size=kwargs.get("chunk_size"),
-        no_n=kwargs.get("no_n"),
     ).run()
 
 
 @click.command(short_help="Use vi on target to write files.")
 def vi():
-    print("TODO")
+    pass
 
 
 @click.command(short_help="Use lua on target to write files.")
 def lua():
-    print("TODO")
+    pass
 
 
 cli.add_command(echo)

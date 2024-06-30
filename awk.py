@@ -30,5 +30,8 @@ class Awk():
             chunk = fd.read(self.chunk_size)
             while chunk:
                 cmd = self.getCmd(chunk)
+                if self.format == "tmux":
+                    cmd = '" \'"\' "'.join(cmd.split('"'))
+                    cmd = f'send-keys "{cmd}"\nsend-keys Enter'
                 print(cmd, file=self.output)
                 chunk = fd.read(self.chunk_size)
