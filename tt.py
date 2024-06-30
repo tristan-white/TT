@@ -9,19 +9,28 @@ from pathlib import Path
 )
 @click.option(
     "-i",
-    "--in-file",
-    type=click.Path(exists=True),
-    help="""Input file""",
+    "--input",
+    type=click.Path(exists=True, dir_okay=False),
+    help="Input file",
     required=True,
 )
 @click.option(
-    "-d",
-    "--dest",
-    type=click.Path(),
-    help="""The remote destination on the target to which the in file will be written.""",
+    "-o",
+    "--output",
+    type=click.File("w"),
+    help="Output file. If not provided, prints to stdout.",
+)
+@click.option(
+    "-r",
+    "--remote-file",
+    type=click.Path(dir_okay=False),
+    required=True,
+    help="""The remote destination to which the file will be written. Can
+    be a base file name or path, but file name must still be provided if
+    path is given."""
 )
 @click.pass_context
-def cli(ctx, **kwargs):
+def cli(ctx: click.Context, **kwargs):
     ctx.ensure_object(dict)
     for key, val in kwargs.items():
         ctx.obj[key] = val
@@ -52,9 +61,25 @@ def awk():
     default=False,
     help="""Use this flag when the '-n' option is not available on the target.""",
 )
+@click.option(
+    "-f",
+    "--format",
+    type=click.Choice(["bash", "tmux"]),
+    default="bash",
+    help="Format of the output script.",
+    show_default=True,
+)
 @click.pass_context
-def echo(ctx: dict, no_n: bool, chunk_size: int):
-    Echo(ctx.obj["in_file"], no_n=no_n, chunk_size=chunk_size).run()
+def echo(ctx: click.Context, **kwargs):
+    Echo(
+        input=ctx.obj["input"],
+        output=ctx.obj["output"],
+        remote_file=ctx.obj["remote_file"],
+        format=kwargs.get("format"),    
+        chunk_size=kwargs.get("chunk_size"),
+        no_n=kwargs.get("no_n"),
+    ).run()
+
 
 @click.command(short_help="Use vi on target to write files.")
 def vi():
