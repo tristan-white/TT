@@ -1,5 +1,6 @@
 import click
 from echo import Echo
+from awk import Awk
 from pathlib import Path
 
 
@@ -43,9 +44,29 @@ def printf():
 
 
 @click.command(short_help="Use awk on target to write files.")
-@click.option("--stdout", is_flag=True, help="Print awk commands to stdout.")
-def awk():
-    print("TODO")
+@click.option(
+    "--chunk-size",
+    default=16,
+    show_default=True,
+    help="""The number of bytes written with each echo command.""",
+)
+@click.option(
+    "-f",
+    "--format",
+    type=click.Choice(["bash", "tmux"]),
+    default="bash",
+    help="Format of the output script.",
+    show_default=True,
+)
+@click.pass_context
+def awk(ctx: click.Context, **kwargs):
+    Awk(
+        input=ctx.obj["input"],
+        output=ctx.obj["output"],
+        remote_file=ctx.obj["remote_file"],
+        format=kwargs.get("format"),    
+        chunk_size=kwargs.get("chunk_size"),
+    ).run()
 
 
 @click.command(short_help="Use echo on target to write files.")
@@ -93,8 +114,7 @@ def lua():
 
 cli.add_command(echo)
 cli.add_command(awk)
-cli.add_command(printf)
-cli.add_command(vi)
+
 
 if __name__ == "__main__":
     cli()

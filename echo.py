@@ -4,7 +4,6 @@ import click
 
 @dataclass
 class Echo:
-    # cli options
     input: str
     output: click.utils.LazyFile
     chunk_size: int
@@ -30,7 +29,7 @@ class Echo:
         else:
             return f"\\x{i:02x}"
 
-    def getEchoCmd(self, data: bytes) -> str:
+    def getCmd(self, data: bytes) -> str:
         cmd = 'echo -n -e "'
         for d in data:
             cmd += self.intToStr(d)
@@ -46,7 +45,7 @@ class Echo:
         with open(self.input, "rb") as fd:
             chunk = fd.read(self.chunk_size)
             while chunk:
-                cmd = self.getEchoCmd(chunk)
+                cmd = self.getCmd(chunk)
                 if self.format == "tmux":
                     cmd = self.getTmuxCmd(cmd)
                 print(cmd, file=self.output)
