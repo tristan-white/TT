@@ -5,8 +5,8 @@ from pathlib import Path
 
 
 @click.group(
-    help="""TinyTyper is a tool that utilizes various techniques to write 
-    files to devices when other tools aren't an option.""",
+    help="""TinyTyper is a tool that utlizies various techniuqes to write
+    files to devices when other tools aren't an option."""
 )
 @click.option(
     "-i",
@@ -30,27 +30,6 @@ from pathlib import Path
     be a base file name or path, but file name must still be provided if
     path is given."""
 )
-@click.pass_context
-def cli(ctx: click.Context, **kwargs):
-    ctx.max_content_width = 120     # makes help menu wider than default (80)
-    ctx.ensure_object(dict)
-    for key, val in kwargs.items():
-        ctx.obj[key] = val
-    pass
-
-
-@click.command(short_help="Use printf on target to write files.")
-def printf():
-    print("TODO")
-
-
-@click.command(short_help="Use awk on target to write files.")
-@click.option(
-    "--chunk-size",
-    default=16,
-    show_default=True,
-    help="""The number of bytes written with each echo command.""",
-)
 @click.option(
     "-f",
     "--format",
@@ -60,12 +39,28 @@ def printf():
     show_default=True,
 )
 @click.pass_context
+def cli(ctx: click.Context, **kwargs):
+    ctx.max_content_width = 120     # makes help menu wider than default (80)
+    ctx.ensure_object(dict)
+    for key, val in kwargs.items():
+        ctx.obj[key] = val
+    pass
+
+
+@click.command(short_help="Use awk on target to write files.")
+@click.option(
+    "--chunk-size",
+    default=16,
+    show_default=True,
+    help="""The number of bytes written with each echo command.""",
+)
+@click.pass_context
 def awk(ctx: click.Context, **kwargs):
     Awk(
         input=ctx.obj["input"],
         output=ctx.obj["output"],
         remote_file=ctx.obj["remote_file"],
-        format=kwargs.get("format"),    
+        format=ctx.obj["format"],    
         chunk_size=kwargs.get("chunk_size"),
     ).run()
 
@@ -97,19 +92,9 @@ def echo(ctx: click.Context, **kwargs):
         input=ctx.obj["input"],
         output=ctx.obj["output"],
         remote_file=ctx.obj["remote_file"],
-        format=kwargs.get("format"),    
+        format=ctx.obj["format"],    
         chunk_size=kwargs.get("chunk_size"),
     ).run()
-
-
-@click.command(short_help="Use vi on target to write files.")
-def vi():
-    pass
-
-
-@click.command(short_help="Use lua on target to write files.")
-def lua():
-    pass
 
 
 cli.add_command(echo)
