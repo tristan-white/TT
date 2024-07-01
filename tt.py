@@ -94,6 +94,7 @@ def echo(ctx: click.Context, **kwargs):
         remote_file=ctx.obj["remote_file"],
         format=ctx.obj["format"],    
         chunk_size=kwargs.get("chunk_size"),
+        no_n=kwargs.get("no_n"),
     ).run()
 
 
