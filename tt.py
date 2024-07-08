@@ -1,6 +1,7 @@
 import click
 from echo import Echo
 from awk import Awk
+from printf import Printf
 from pathlib import Path
 
 
@@ -11,9 +12,9 @@ from pathlib import Path
 @click.option(
     "-i",
     "--input",
-    type=click.Path(exists=True, dir_okay=False),
-    help="Input file",
-    required=True,
+    type=click.File(),
+    help="Input file. Defaults to stdin.",
+    default="-",
 )
 @click.option(
     "-o",
@@ -28,7 +29,7 @@ from pathlib import Path
     required=True,
     help="""The remote destination to which the file will be written. Can
     be a base file name or path, but file name must still be provided if
-    path is given."""
+    path is given.""",
 )
 @click.option(
     "-f",
@@ -40,7 +41,7 @@ from pathlib import Path
 )
 @click.pass_context
 def cli(ctx: click.Context, **kwargs):
-    ctx.max_content_width = 120     # makes help menu wider than default (80)
+    ctx.max_content_width = 120  # makes help menu wider than default (80)
     ctx.ensure_object(dict)
     for key, val in kwargs.items():
         ctx.obj[key] = val
@@ -60,7 +61,7 @@ def awk(ctx: click.Context, **kwargs):
         input=ctx.obj["input"],
         output=ctx.obj["output"],
         remote_file=ctx.obj["remote_file"],
-        format=ctx.obj["format"],    
+        format=ctx.obj["format"],
         chunk_size=kwargs.get("chunk_size"),
     ).run()
 
@@ -73,10 +74,21 @@ def awk(ctx: click.Context, **kwargs):
     help="""The number of bytes written with each echo command.""",
 )
 @click.option(
-    "--no-n",
+    "--head-c",
     is_flag=True,
     default=False,
-    help="""Use this flag when the '-n' option is not available on the target.""",
+    help="""Use echo in conjuction with 'head -c'. Use when the echo's -n
+    option is not available.""",
+    show_default=True,
+)
+@click.option(
+    "--ansic",
+    help="""Use ANSI-C Quoting to print bytes instead of echo's -e option.
+    Note: ANSI-C Quoting cannot print null bytes; therefore, --head-c must 
+    but used in conjunction with this option.""",
+    is_flag=True,
+    default=False,
+    show_default=True,
 )
 @click.option(
     "-f",
@@ -92,14 +104,32 @@ def echo(ctx: click.Context, **kwargs):
         input=ctx.obj["input"],
         output=ctx.obj["output"],
         remote_file=ctx.obj["remote_file"],
-        format=ctx.obj["format"],    
+        format=ctx.obj["format"],
         chunk_size=kwargs.get("chunk_size"),
-        no_n=kwargs.get("no_n"),
+        head_c=kwargs.get("head_c"),
+    ).run()
+
+@click.command()
+@click.option(
+    "--chunk-size",
+    default=64,
+    show_default=True,
+    help="""The number of bytes written with each echo command.""",
+)
+@click.pass_context
+def printf(ctx: click.Context, **kwargs):
+    Printf(
+        input=ctx.obj["input"],
+        output=ctx.obj["output"],
+        remote_file=ctx.obj["remote_file"],
+        format=ctx.obj["format"],
+        chunk_size=kwargs.get("chunk_size"),
     ).run()
 
 
 cli.add_command(echo)
 cli.add_command(awk)
+cli.add_command(printf)
 
 
 if __name__ == "__main__":
