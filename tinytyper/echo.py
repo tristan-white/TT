@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from utils import int_to_hex
+from tinytyper.utils import int_to_hex
 import click
 
 

@@ -1,7 +1,7 @@
 import click
-from echo import Echo
-from awk import Awk
-from printf import Printf
+from tinytyper.echo import Echo
+from tinytyper.awk import Awk
+from tinytyper.printf import Printf
 from pathlib import Path
 
 
@@ -131,6 +131,4 @@ cli.add_command(echo)
 cli.add_command(awk)
 cli.add_command(printf)
 
-
-if __name__ == "__main__":
-    cli()
+cli()

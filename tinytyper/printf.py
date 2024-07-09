@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 import click
-from utils import int_to_hex
+from tinytyper.utils import int_to_hex
 
 @dataclass
 class Printf:
